@@ -58,15 +58,15 @@ class MixamoDownloader(QtCore.QObject):
         return
 
     def make_request(self, method, url, **kwargs):
-        for _ in range(5):  # Retry 3 times
+        for _ in range(10):  # Retry 10 times
             try:
-                response = session.request(method, url, timeout=10, **kwargs)
-                time.sleep(5)  # Sleep for 3 seconds after each request
+                response = session.request(method, url, timeout=30, **kwargs)
+                time.sleep(3)  # Sleep for 3 seconds after each request
                 return response
             except (requests.exceptions.Timeout, requests.exceptions.RequestException) as e:
-                time.sleep(5)
+                time.sleep(3)
                 continue
-        raise Exception(f"Failed to complete request to {url} after 3 retries.")
+        raise Exception(f"Failed to complete request to {url} after 10 retries.")
 
     def get_primary_character_id(self):
         response = self.make_request("GET", "https://www.mixamo.com/api/v1/characters/primary", headers=HEADERS)
@@ -149,7 +149,7 @@ class MixamoDownloader(QtCore.QObject):
         status = None
 
         while status != "completed":
-            time.sleep(5)
+            time.sleep(3)
             response = self.make_request("GET", f"https://www.mixamo.com/api/v1/characters/{character_id}/monitor", headers=HEADERS)
             status = response.json().get("status")
 
